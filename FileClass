@@ -1,0 +1,38 @@
+import os
+import tempfile
+
+
+class File:
+    def __init__(self, path):
+        self.path = path
+        self.scope = 0
+
+    def __str__(self):
+        return self.path
+
+    def write(self, val):
+        with open(self.path, 'w') as f:
+            return f.write(val)
+
+    def read(self):
+        with open(self.path, 'r') as f:
+            return f.read()
+
+    def __add__(self, other):
+        new_path = os.path.join(tempfile.gettempdir(), "sum")
+        new_file = type(self)(new_path)
+        new_file.write(self.read() + other.read())
+        return new_file
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with open(self.path, 'r') as f:
+            f.seek(self.scope)
+            result = f.readline()
+            if self.scope < f.tell():
+                self.scope = f.tell()
+            else:
+                raise StopIteration
+            return result
